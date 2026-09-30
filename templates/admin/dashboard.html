@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<h3 class="mb-4">Admin Dashboard</h3>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-6">
+        <div class="stat-card bg-treks">
+            <div class="small">Total Treks</div>
+            <h2>{{ trek_count }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card bg-people">
+            <div class="small">Users + Staff</div>
+            <h2>{{ people_count }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card bg-bookings">
+            <div class="small">Total Bookings</div>
+            <h2>{{ booking_count }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card bg-pending">
+            <div class="small">Staff Awaiting Approval</div>
+            <h2>{{ pending_staff }}</h2>
+        </div>
+    </div>
+</div>
+
+{% if pending_staff > 0 %}
+<div class="alert alert-warning">
+    You have <strong>{{ pending_staff }}</strong> staff registration(s) waiting for approval.
+    <a href="{{ url_for('admin_staff') }}" class="alert-link">Review now &rarr;</a>
+</div>
+{% endif %}
+
+<div class="card p-3">
+    <h5>Recently Added Treks</h5>
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Location</th><th>Difficulty</th><th>Status</th><th>Slots</th></tr>
+        </thead>
+        <tbody>
+            {% for t in recent_treks %}
+            <tr>
+                <td>{{ t.id }}</td>
+                <td>{{ t.name }}</td>
+                <td>{{ t.location }}</td>
+                <td><span class="badge badge-difficulty-{{ t.difficulty }}">{{ t.difficulty }}</span></td>
+                <td><span class="badge badge-status-{{ t.status }}">{{ t.status }}</span></td>
+                <td>{{ t.available_slots }} / {{ t.total_slots }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="text-muted text-center">No treks created yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

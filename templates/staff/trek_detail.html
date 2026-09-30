@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ trek.name }} - Manage{% endblock %}
+{% block content %}
+<a href="{{ url_for('staff_dashboard') }}" class="btn btn-sm btn-outline-secondary mb-3">&larr; Back to My Treks</a>
+
+<div class="row g-3">
+    <div class="col-md-5">
+        <div class="card p-3">
+            <h4>{{ trek.name }}</h4>
+            <p class="text-muted mb-1">📍 {{ trek.location }}</p>
+            <p class="mb-1"><span class="badge badge-difficulty-{{ trek.difficulty }}">{{ trek.difficulty }}</span>
+               <span class="badge badge-status-{{ trek.status }}">{{ trek.status }}</span></p>
+            <p class="mb-1">Duration: {{ trek.duration_days }} days</p>
+            <p class="mb-1">Dates: {{ trek.start_date or "—" }} to {{ trek.end_date or "—" }}</p>
+            <p class="mb-3">Slots: {{ trek.available_slots }} / {{ trek.total_slots }}</p>
+
+            <hr>
+            <h6>Update Trek</h6>
+            <form method="POST" action="{{ url_for('staff_update_trek', trek_id=trek.id) }}">
+                <div class="mb-2">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="Open" {% if trek.status=='Open' %}selected{% endif %}>Open</option>
+                        <option value="Closed" {% if trek.status=='Closed' %}selected{% endif %}>Closed</option>
+                        <option value="Ongoing" {% if trek.status=='Ongoing' %}selected{% endif %}>Ongoing (Started)</option>
+                        <option value="Completed" {% if trek.status=='Completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Available Slots</label>
+                    <input type="number" name="available_slots" min="0" max="{{ trek.total_slots }}"
+                           class="form-control" value="{{ trek.available_slots }}" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Save Update</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="card p-3">
+            <h5>Registered Participants ({{ participants|length }})</h5>
+            <table class="table table-sm table-hover">
+                <thead><tr><th>Name</th><th>Email</th><th>Contact</th><th>Booked On</th><th>Status</th></tr></thead>
+                <tbody>
+                    {% for p in participants %}
+                    <tr>
+                        <td>{{ p.full_name }}</td>
+                        <td>{{ p.email or "—" }}</td>
+                        <td>{{ p.contact or "—" }}</td>
+                        <td class="small">{{ p.booking_date }}</td>
+                        <td><span class="badge badge-status-{{ 'Open' if p.status=='Booked' else 'Completed' }}">{{ p.status }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-muted text-center">No participants registered yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard{% endblock %}
+{% block content %}
+<h3 class="mb-4">Welcome, {{ session.get('full_name') }}!</h3>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card bg-treks">
+            <div class="small">Upcoming Treks</div>
+            <h2>{{ upcoming|length }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card bg-bookings">
+            <div class="small">Total Booking History</div>
+            <h2>{{ history_count }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('user_treks') }}" class="stat-card bg-people text-decoration-none text-white d-block">
+            <div class="small">Browse & Book Treks</div>
+            <h2>&rarr;</h2>
+        </a>
+    </div>
+</div>
+
+<div class="card p-3">
+    <h5>Your Upcoming Bookings</h5>
+    <table class="table table-hover mb-0">
+        <thead><tr><th>Trek</th><th>Location</th><th>Start Date</th><th>Trek Status</th></tr></thead>
+        <tbody>
+            {% for b in upcoming %}
+            <tr>
+                <td>{{ b.trek_name }}</td>
+                <td>{{ b.location }}</td>
+                <td>{{ b.start_date or "—" }}</td>
+                <td><span class="badge badge-status-{{ b.trek_status }}">{{ b.trek_status }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-muted text-center">No upcoming bookings. <a href="{{ url_for('user_treks') }}">Browse treks &rarr;</a></td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

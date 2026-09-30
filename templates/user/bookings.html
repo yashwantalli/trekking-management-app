@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}My Bookings{% endblock %}
+{% block content %}
+<h3 class="mb-3">My Bookings & Trekking History</h3>
+
+<div class="card p-3">
+<table class="table table-hover align-middle">
+    <thead>
+        <tr><th>Trek</th><th>Location</th><th>Difficulty</th><th>Dates</th><th>Booked On</th><th>Status</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+        {% for b in bookings %}
+        <tr>
+            <td>{{ b.trek_name }}</td>
+            <td>{{ b.location }}</td>
+            <td><span class="badge badge-difficulty-{{ b.difficulty }}">{{ b.difficulty }}</span></td>
+            <td class="small">{{ b.start_date or "—" }} to {{ b.end_date or "—" }}</td>
+            <td class="small">{{ b.booking_date }}</td>
+            <td>
+                {% if b.status == 'Booked' %}
+                    <span class="badge bg-success">Booked</span>
+                {% elif b.status == 'Cancelled' %}
+                    <span class="badge bg-secondary">Cancelled</span>
+                {% else %}
+                    <span class="badge bg-purple badge-status-Completed">Completed</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if b.status == 'Booked' %}
+                <a href="{{ url_for('user_cancel_booking', booking_id=b.id) }}" class="btn btn-sm btn-outline-danger">Cancel</a>
+                {% else %}
+                &mdash;
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-muted text-center">You haven't booked any treks yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

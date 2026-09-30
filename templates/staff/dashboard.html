@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}My Treks{% endblock %}
+{% block content %}
+<h3 class="mb-4">Treks Assigned to Me</h3>
+
+<div class="row g-3">
+    {% for t in treks %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card p-3 h-100">
+            <div class="d-flex justify-content-between align-items-start">
+                <h5>{{ t.name }}</h5>
+                <span class="badge badge-status-{{ t.status }}">{{ t.status }}</span>
+            </div>
+            <p class="text-muted mb-1">📍 {{ t.location }} &middot; {{ t.duration_days }} days</p>
+            <p class="mb-1"><span class="badge badge-difficulty-{{ t.difficulty }}">{{ t.difficulty }}</span></p>
+            <p class="mb-2">Slots: {{ t.available_slots }} / {{ t.total_slots }}</p>
+            <p class="small text-muted mb-3">{{ t.start_date or "—" }} to {{ t.end_date or "—" }}</p>
+            <a href="{{ url_for('staff_trek_detail', trek_id=t.id) }}" class="btn btn-success mt-auto">Manage Trek</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">No treks have been assigned to you yet. Check back after the admin assigns one.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

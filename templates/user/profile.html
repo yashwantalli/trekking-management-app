@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<div class="card auth-card p-4">
+    <h3 class="mb-3 text-center">My Profile</h3>
+    <form method="POST" action="{{ url_for('user_profile') }}">
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-control" value="{{ user.username }}" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="full_name" class="form-control" value="{{ user.full_name }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" value="{{ user.email or '' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Contact Number</label>
+            <input type="text" name="contact" class="form-control" value="{{ user.contact or '' }}">
+        </div>
+        <button type="submit" class="btn btn-success w-100">Save Changes</button>
+    </form>
+</div>
+{% endblock %}

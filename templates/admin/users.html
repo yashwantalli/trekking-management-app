@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Manage Users{% endblock %}
+{% block content %}
+<h3 class="mb-3">Manage Trekkers</h3>
+
+<form method="GET" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input type="text" name="q" class="form-control" placeholder="Search by name, username or ID" value="{{ q }}">
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-outline-secondary w-100" type="submit">Search</button>
+    </div>
+</form>
+
+<div class="card p-3">
+<table class="table table-hover align-middle">
+    <thead>
+        <tr><th>ID</th><th>Name</th><th>Username</th><th>Email</th><th>Contact</th><th>Status</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+        {% for u in users %}
+        <tr>
+            <td>{{ u.id }}</td>
+            <td>{{ u.full_name }}</td>
+            <td>{{ u.username }}</td>
+            <td>{{ u.email or "—" }}</td>
+            <td>{{ u.contact or "—" }}</td>
+            <td><span class="badge badge-approval-{{ u.approval_status }}">{{ u.approval_status }}</span></td>
+            <td class="text-nowrap">
+                {% if u.approval_status == 'blacklisted' %}
+                    <a href="{{ url_for('admin_reactivate_user', user_id=u.id) }}" class="btn btn-sm btn-outline-success">Reactivate</a>
+                {% else %}
+                    <a href="{{ url_for('admin_blacklist_user', user_id=u.id) }}" class="btn btn-sm btn-outline-danger">Blacklist</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-muted text-center">No users found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

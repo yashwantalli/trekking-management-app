@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Manage Treks{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h3 class="mb-0">Manage Treks</h3>
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTrekModal">+ Add Trek</button>
+</div>
+
+<form method="GET" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input type="text" name="q" class="form-control" placeholder="Search by name, location or ID" value="{{ q }}">
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-outline-secondary w-100" type="submit">Search</button>
+    </div>
+</form>
+
+<div class="card p-3">
+<table class="table table-hover align-middle">
+    <thead>
+        <tr>
+            <th>ID</th><th>Name</th><th>Location</th><th>Difficulty</th><th>Duration</th>
+            <th>Slots</th><th>Assigned Staff</th><th>Status</th><th>Dates</th><th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in treks %}
+        <tr>
+            <td>{{ t.id }}</td>
+            <td>{{ t.name }}</td>
+            <td>{{ t.location }}</td>
+            <td><span class="badge badge-difficulty-{{ t.difficulty }}">{{ t.difficulty }}</span></td>
+            <td>{{ t.duration_days }} days</td>
+            <td>{{ t.available_slots }} / {{ t.total_slots }}</td>
+            <td>{{ t.staff_name or "—" }}</td>
+            <td><span class="badge badge-status-{{ t.status }}">{{ t.status }}</span></td>
+            <td class="small">{{ t.start_date or "—" }} to {{ t.end_date or "—" }}</td>
+            <td class="text-nowrap">
+                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editTrekModal{{ t.id }}">Edit</button>
+                {% if t.status == 'Pending' %}
+                <a href="{{ url_for('admin_approve_trek', trek_id=t.id) }}" class="btn btn-sm btn-outline-success">Approve</a>
+                {% endif %}
+                <a href="{{ url_for('admin_delete_trek', trek_id=t.id) }}" class="btn btn-sm btn-outline-danger">Delete</a>
+            </td>
+        </tr>
+
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editTrekModal{{ t.id }}" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form method="POST" action="{{ url_for('admin_edit_trek', trek_id=t.id) }}">
+                <div class="modal-header"><h5 class="modal-title">Edit Trek #{{ t.id }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-2"><label class="form-label">Name</label>
+                        <input type="text" name="name" class="form-control" value="{{ t.name }}" required></div>
+                    <div class="mb-2"><label class="form-label">Location</label>
+                        <input type="text" name="location" class="form-control" value="{{ t.location }}" required></div>
+                    <div class="mb-2"><label class="form-label">Difficulty</label>
+                        <select name="difficulty" class="form-select">
+                            <option {% if t.difficulty=='Easy' %}selected{% endif %}>Easy</option>
+                            <option {% if t.difficulty=='Moderate' %}selected{% endif %}>Moderate</option>
+                            <option {% if t.difficulty=='Hard' %}selected{% endif %}>Hard</option>
+                        </select></div>
+                    <div class="mb-2"><label class="form-label">Duration (days)</label>
+                        <input type="number" min="1" name="duration_days" class="form-control" value="{{ t.duration_days }}" required></div>
+                    <div class="mb-2"><label class="form-label">Total Slots</label>
+                        <input type="number" min="1" name="total_slots" class="form-control" value="{{ t.total_slots }}" required></div>
+                    <div class="mb-2"><label class="form-label">Start Date</label>
+                        <input type="date" name="start_date" class="form-control" value="{{ t.start_date }}"></div>
+                    <div class="mb-2"><label class="form-label">End Date</label>
+                        <input type="date" name="end_date" class="form-control" value="{{ t.end_date }}"></div>
+                    <div class="mb-2"><label class="form-label">Assigned Staff</label>
+                        <select name="assigned_staff_id" class="form-select">
+                            <option value="">-- Unassigned --</option>
+                            {% for s in staff_list %}
+                            <option value="{{ s.id }}" {% if t.assigned_staff_id == s.id %}selected{% endif %}>{{ s.full_name }}</option>
+                            {% endfor %}
+                        </select></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <tr><td colspan="10" class="text-muted text-center">No treks found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<!-- Add Trek Modal -->
+<div class="modal fade" id="addTrekModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{{ url_for('admin_add_trek') }}">
+        <div class="modal-header"><h5 class="modal-title">Add New Trek</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+            <div class="mb-2"><label class="form-label">Name</label>
+                <input type="text" name="name" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">Location</label>
+                <input type="text" name="location" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">Difficulty</label>
+                <select name="difficulty" class="form-select">
+                    <option>Easy</option><option>Moderate</option><option>Hard</option>
+                </select></div>
+            <div class="mb-2"><label class="form-label">Duration (days)</label>
+                <input type="number" min="1" name="duration_days" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">Total Slots</label>
+                <input type="number" min="1" name="total_slots" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">Start Date</label>
+                <input type="date" name="start_date" class="form-control"></div>
+            <div class="mb-2"><label class="form-label">End Date</label>
+                <input type="date" name="end_date" class="form-control"></div>
+            <div class="form-text mb-2">New treks start as "Pending" &mdash; approve them to make them bookable.</div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Create Trek</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
